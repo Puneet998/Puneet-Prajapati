@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+
+<link rel="icon" href="/assests/logo.png">
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/css/style.css" />
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<!-- Typed.js -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+
+
+
+<style>
+/* Neon Circles Background */
+.neon-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+    background: black;
+}
+.neon-bg .circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #00ccff;
+    background: black;
+    box-shadow: 0 0 8px #00ccff, 0 0 15px rgba(0,204,255,0.6);
+    animation: fall-diag linear infinite;
+}
+@keyframes fall-diag {
+    0% { transform: translate(0,0); opacity:1; }
+    100% { transform: translate(-200px,110vh); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Neon Circles Background -->
+<div class="neon-bg"></div>
+
+<!-- Navbar -->
+<%- include('partials/navbar') %>
+
+<!-- Flash Messages -->
+<%- include('flash') %>
+
+<main>
+  <!-- Hero Section -->
+  <%- include('pages/home') %>
+
+  <!-- About Section -->
+  <%- include('pages/about') %>
+
+  <!-- Skills Section -->
+  <%- include('pages/skill') %>
+
+  <!-- Projects Section -->
+  <%- include('pages/projects') %>
+
+  <!-- Contact Section -->
+  <%- include('pages/contact') %>
+</main>
+
+<!-- Footer -->
+<%- include('partials/footer') %>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Typed.js Hero Animation -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var typed = new Typed('.typed-text', {
+      strings: [
+        "Full Stack Developer",
+        "C++ with DSA",
+        "Python Developer",
+        "Creative Websites"
+      ],
+      typeSpeed: 60,
+      backSpeed: 40,
+      backDelay: 1500,
+      loop: true,
+      showCursor: true,
+      cursorChar: "|"
+    });
+});
+</script>
+
+<!-- GSAP Scroll Animations -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.utils.toArray("main section").forEach(section => {
+    gsap.from(section, {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: section,
+        start: "top 80%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+
+  // Navbar shadow on scroll
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    if(window.scrollY > 50){
+      navbar.classList.add("shadow-lg");
+    } else {
+      navbar.classList.remove("shadow-lg");
+    }
+  });
+
+  ////
+});
+</script>
+
+<!-- Neon Circles JS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.querySelector('.neon-bg');
+
+    function createCircle() {
+        const circle = document.createElement('div');
+        circle.classList.add('circle');
+
+        const size = Math.random() * 34 + 6;//34+6
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+
+        circle.style.left = `${Math.random() * 100}vw`;
+        circle.style.top = `-${size}px`;
+
+        const duration = Math.random() * 4 + 3;
+        circle.style.animationDuration = `${duration}s`;
+
+        container.appendChild(circle);
+
+        setTimeout(() => circle.remove(), duration * 1000);//1000
+    }
+
+    setInterval(createCircle, 200);//200
+});
+</script>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

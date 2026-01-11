@@ -1,0 +1,63 @@
+
+
+<footer class="footer py-4">
+  <div class="container text-center">
+    <div class="social-links mb-3">
+      <a href="https://github.com/Puneet998" target="_blank" class="social-icon">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/puneetprajapati9936/" target="_blank" class="social-icon">
+        <i class="fab fa-linkedin"></i>
+      </a>
+      <a href="https://wa.me/919936344869" target="_blank" class="social-icon">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+        <a href="/public/assests/z4.mp3" id="musicLink"  class="social-icon">
+    <i id="musicIcon" class="fas fa-volume-mute"></i>
+     </a>
+
+  <!-- Audio File -->
+  <audio id="bgMusic" src="/assests/z4.mp3" loop></audio>
+      
+      <!-- 🎵 Music Icon -->
+    </div>
+
+    <p class="copyright">
+      &copy; <%= new Date().getFullYear() %> Puneet Prajapati. All Rights Reserved.
+    </p>
+  </div>
+</footer>
+
+
+<!-- Footer Section -->
+
+  
+  <!-- Music Link -->
+
+
+<!-- FontAwesome CDN for icons -->
+<script src="https://kit.fontawesome.com/yourkitid.js" crossorigin="anonymous"></script>
+
+<script>
+  const musicLink = document.getElementById("musicLink");
+  const musicIcon = document.getElementById("musicIcon");
+  const bgMusic = document.getElementById("bgMusic");
+
+  let isPlaying = false;
+
+  musicLink.addEventListener("click", (e) => {
+    e.preventDefault(); // Prevent page jump
+
+    if (!isPlaying) {
+      bgMusic.play();
+      musicIcon.classList.remove("fa-volume-mute");
+      musicIcon.classList.add("fa-volume-up");
+      isPlaying = true;
+    } else {
+      bgMusic.pause();
+      musicIcon.classList.remove("fa-volume-up");
+      musicIcon.classList.add("fa-volume-mute");
+      isPlaying = false;
+    }
+  });
+</script>

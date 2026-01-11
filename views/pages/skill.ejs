@@ -1,0 +1,45 @@
+<section id="skills" class="skills-section py-5" >
+  <div class="container">
+    <h2 class="text-center section-title mb-5">My Skills</h2>
+    <div class="row skill-grid justify-content-center">
+      <% const skillData = [
+        { img: 'cpp.png', name: 'C++', level: 50 },
+        { img: 'c.jpg', name: 'C', level: 50 },
+        { img: 'java.png', name: 'Java', level: 30 },
+        { img: 'python.png', name: 'Python', level: 70 },
+        { img: 'html.png', name: 'HTML', level: 80 },
+        { img: 'css.png', name: 'CSS', level: 60 },
+        { img: 'bootstrap.png', name: 'Bootstrap', level: 50 },
+        { img: 'tailwind.png', name: 'Tailwind', level: 30 },
+        { img: 'react.jpg', name: 'React', level: 40 },
+        { img: 'express.png', name: 'Express', level: 60 },
+        { img: 'node.png', name: 'Node.js', level: 50 },
+        { img: 'javascript.png', name: 'JavaScript', level: 60 },
+        { img: 'github.png', name: 'GitHub', level: 50 },
+        { img: 'vscode.png', name: 'VS Code', level: 80 },
+        { img: 'render.png', name: 'Render', level: 60 },
+        { img: 'typescript.png', name: 'TypeScript', level: 30 },
+        { img: 'rest.png', name: 'REST API', level: 90 },
+        { img: 'nextjs-icon.webp', name: 'Next.js', level: 80 }
+      ]; %>
+
+      <% skillData.forEach(skill => { %>
+        <div class="col-custom-xl col-lg-2 col-md-3 col-sm-6 col-6 mb-4 " >
+
+          <div class="skill-box">
+            <img src="/assests/<%= skill.img %>" alt="<%= skill.name %>" class="skill-image">
+            <p class="skill-name"><%= skill.name %></p>
+            <div class="circle-container">
+              <div class="circle  ccircle  " data-percent="<%= skill.level %>">
+                <span class="percent-text"><%= skill.level %>%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+
+<!-- https://m41sqkvg-4000.inc1.devtunnels.ms/ -->

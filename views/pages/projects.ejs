@@ -1,0 +1,192 @@
+<!-- <section id="projects" class="projects-section py-5">
+  <div class="container">
+    <h2 class="text-center section-title mb-5">My Projects</h2>
+    <div class="project-grid">
+      <% const projectss = [
+        { 
+          title: 'Wanderlust.com', 
+          desc: 'Full-stack project with MVC framework.',
+          tech: 'Node.js, Express, MongoDB, EJS',
+          link: 'https://wanderlust-2zwy.onrender.com',
+          img: "/assests/wanderlust.png"
+        },
+        { 
+          title: 'Gym Website', 
+          desc: 'Dynamic gym website with full-stack features.',
+          tech: 'HTML, CSS, JavaScript, Node.js',
+          link: '#',
+          img: '/images/gym.png'
+        },
+        { 
+          title: 'E-Commerce Store', 
+          desc: 'Shopping website with cart and payment.',
+          tech: 'React, Node.js, MongoDB',
+          link: '#',
+          img: '/images/ecommerce.png'
+        },
+        { 
+          title: 'Weather App', 
+          desc: 'Weather forecast app using OpenWeather API.',
+          tech: 'HTML, CSS, JS, OpenWeather API',
+          link: '#',
+          img: '/images/weather.png'
+        }
+      ]; %>
+
+      <% projectss.forEach(project => { %>
+        <div class="project-card">
+          <div class="project-img-container">
+            <img src="<%= project.img %>" alt="<%= project.title %> Screenshot" class="project-img">
+          </div>
+          <div class="project-info">
+            <h4><%= project.title %></h4>
+            <p class="tech-stack"><%= project.tech %></p>
+            <p><%= project.desc %></p>
+            <a href="<%= project.link %>" target="_blank" class="btn-demo">Live Demo</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</section> -->
+
+<style>
+  .carousel {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.carousel-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: none;
+}
+
+.carousel-img.active {
+  display: block;
+}
+
+.prev-btn, .next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  background: black;
+  color: white;
+  cursor: pointer;
+  border: none;
+  opacity: 0.6;
+}
+
+.prev-btn {
+  left: 5px;
+}
+
+.next-btn {
+  right: 5px;
+}
+
+</style>
+
+
+
+
+<section id="projects" class="projects-section py-5">
+  <div class="container">
+    <h2 class="text-center section-title mb-5">My Projects</h2>
+    <div class="project-grid">
+
+      <% const projects = [
+        { 
+          title: 'Wanderlust.com', 
+          desc: 'Full-stack project with MVC framework.',
+          tech: 'Node.js, Express, MongoDB, EJS',
+          link: 'https://wanderlust-2zwy.onrender.com',
+          images: [
+            "/assests/wanderlust.png",
+            "/assests/wanderlust1.png",
+            "/assests/wanderlust.png",
+            "/assests/wanderlust.png"
+          ]
+        },
+        { 
+          title: 'Gym Website', 
+          desc: 'Dynamic gym website with full-stack features.',
+          tech: 'HTML, CSS, JavaScript, Node.js',
+          link: '#',
+          images: [
+            "/images/gym1.png",
+            "/images/gym2.png",
+            "/images/gym3.png"
+          ]
+        },
+        { 
+          title: 'E-Commerce Store', 
+          desc: 'Shopping website with cart and payment.',
+          tech: 'React, Node.js, MongoDB',
+          link: '#',
+          images: [
+            "/images/ecommerce1.png",
+            "/images/ecommerce2.png",
+            "/images/ecommerce3.png"
+          ]
+        },
+        { 
+          title: 'Weather App', 
+          desc: 'Weather forecast app using OpenWeather API.',
+          tech: 'HTML, CSS, JS, OpenWeather API',
+          link: '#',
+          images: [
+            "/images/weather1.png",
+            "/images/weather2.png",
+            "/images/weather3.png"
+          ]
+        }
+      ]; %>
+
+      <% projects.forEach(project => { %>
+        <div class="project-card">
+
+          <!-- CAROUSEL START -->
+          <div class="carousel" id="<%= project.title %>-carousel">
+            <% project.images.forEach((image, index) => { %>
+              <img src="<%= image %>" alt="<%= project.title %>" class="carousel-img <%= index === 0 ? 'active' : '' %>">
+            <% }); %>
+
+            <button class="prev-btn" onclick="moveSlide('<%= project.title %>-carousel', -1)">❮</button>
+            <button class="next-btn" onclick="moveSlide('<%= project.title %>-carousel', 1)">❯</button>
+          </div>
+          <!-- CAROUSEL END -->
+
+          <div class="project-info">
+            <h4><%= project.title %></h4>
+            <p class="tech-stack"><%= project.tech %></p>
+            <p><%= project.desc %></p>
+            <a href="<%= project.link %>" target="_blank" class="btn-demo">Live Demo</a>
+          </div>
+        </div>
+      <% }); %>
+
+    </div>
+  </div>
+</section>
+
+
+<script>
+  function moveSlide(id, step) {
+    const carousel = document.getElementById(id);
+    const images = carousel.querySelectorAll('.carousel-img');
+    let current = [...images].findIndex(img => img.classList.contains('active'));
+
+    images[current].classList.remove('active');
+    current = (current + step + images.length) % images.length;
+    images[current].classList.add('active');
+  }
+</script>
+
+
+
