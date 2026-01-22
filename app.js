@@ -25,11 +25,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL,
+//     pass: process.env.PASSWORD
+//   }
+// });
+
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD
+    user: process.env.BREVO_SMTP_LOGIN,
+    pass: process.env.BREVO_SMTP_KEY
   }
 });
 
@@ -64,6 +75,14 @@ app.use((req,res,next)=>{
 })
 
 app.get('/', (req, res) => {
+  // if(req.headers['sec-ch-ua-platform']=='"Android"'){
+  //   res.send('you need a laptop and computer');
+  //   return;
+  // }
+  // else if(req.headers['sec-ch-ua-platform']=='"Windows"'){
+  // res.render('index.ejs');
+  //   return;
+  // } 
   res.render('index.ejs');
 });
 
@@ -72,18 +91,18 @@ app.get('/', (req, res) => {
 app.post('/contact', async (req, res) => {
   const { name, email, message } = req.body;
 
-  console.log("👉 req.body:", req.body);
+  console.log("req.body:", req.body);
 
-  // ✅ Joi Validation
+  // Joi Validation
   const { error } = validateMessage({ name, email, message });
   if (error) {
-    req.flash("error", "❌ Invalid input data");
-    console.error("❌ Validation Error:", error.details[0].message);
+    req.flash("error", "Invalid input data");
+    console.error("Validation Error:", error.details[0].message);
     return res.redirect("/");
   }
 
   try {
-    // ✅ Save to Database
+    // Save to Database
     const newMessage = new Message({
       name,
       email,
@@ -92,14 +111,14 @@ app.post('/contact', async (req, res) => {
     });
 
     await newMessage.save();
-    console.log("✅ Message saved to DB");
+    console.log("Message saved to DB");
 
-    // ✅ Send Email
+    // Send Email
     const capName = name.toUpperCase();
 
     const mailOptions = {
-      from: process.env.EMAIL,
-      to: process.env.EMAIL,
+      from:process.env.BREVO_SENDER_EMAIL,
+      to: process.env.BREVO_SENDER_EMAIL,
       subject: `New Message from ${capName} - Portfolio Website`,
       html: `
         <p><strong>Sender:</strong> ${capName}</p>
@@ -110,18 +129,19 @@ app.post('/contact', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully");
 
-    // ✅ Success Flash
+    console.log("Email sent successfully");
+
+    // Success Flash
     req.flash(
       "success",
-      `😀 Thank you Mr. ${capName}, I'll reply soon via E-mail.`
+      `Thank you Mr. ${capName}, I'll reply soon via E-mail.`
     );
     res.redirect("/");
 
   } catch (err) {
-    console.error("❌ Error:", err);
-    req.flash("error", "❌ Something went wrong. Please try again.");
+    console.error("Error:", err);
+    req.flash("error", "Something went wrong. Please try again.");
     res.redirect("/");
   }
 });
@@ -140,7 +160,7 @@ app.post("/sendMail", async (req, res) => {
     // ------------------ VALIDATION ------------------
     const { error } = validateMessage({ name, email, message });
     if (error) {
-      console.error("❌ Validation Failed:", error.details[0].message);
+      console.error("Validation Failed:", error.details[0].message);
       return res.status(400).json({
         success: false,
         message: error.details[0].message
@@ -156,14 +176,14 @@ app.post("/sendMail", async (req, res) => {
     });
 
     await newMessage.save();
-    console.log("✅ Message saved to database");
+    console.log("Message saved to database");
 
     // ------------------ SEND EMAIL ------------------
     const formattedName = name.toUpperCase();
 
     const mailOptions = {
-      from: process.env.EMAIL,
-      to: process.env.EMAIL,
+      from:process.env.BREVO_SENDER_EMAIL,
+      to: process.env.BREVO_SENDER_EMAIL,
       subject: `New Message from ${formattedName} - Portfolio`,
       html: `
         <h3>New Contact Submission</h3>
@@ -175,7 +195,7 @@ app.post("/sendMail", async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("📩 Email sent successfully");
+    console.log("Email sent successfully");
 
     // ------------------ RESPONSE ------------------
     return res.status(200).json({
@@ -184,7 +204,7 @@ app.post("/sendMail", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Server Error:", err);
+    console.error("Server Error:", err);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -193,18 +213,6 @@ app.post("/sendMail", async (req, res) => {
   }
 });
 
-
-// -----------------------------------
-
-// app.get("/more",(req,res)=>{
-//   res.render("more")
-// })
-
- app.get("/msg",async (req,res)=>{
-  let message=await Message.find();
-  // console.log(message[1]);
-   res.send(message)
- })
 
 app.all("*",(req,res)=>{
     res.redirect('/'); // Redirect all unknown routes to home;
