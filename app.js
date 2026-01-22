@@ -47,7 +47,7 @@ app.use(express.json());
 
 // import nodemailer from "nodemailer";
 
-export const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
