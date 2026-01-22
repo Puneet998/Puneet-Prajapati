@@ -34,15 +34,38 @@ app.use(express.json());
 // });
 
 
-const transporter = nodemailer.createTransport({
+// const transporter = nodemailer.createTransport({
+//   host: "smtp-relay.brevo.com",
+//   port: 587,
+//   secure: false,
+//   auth: {
+//     user: process.env.BREVO_SMTP_LOGIN,
+//     pass: process.env.BREVO_SMTP_KEY
+//   }
+// });
+
+
+// import nodemailer from "nodemailer";
+
+export const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
+
   auth: {
     user: process.env.BREVO_SMTP_LOGIN,
     pass: process.env.BREVO_SMTP_KEY
-  }
+  },
+
+  // 🔥 CRITICAL FOR RENDER
+  pool: true,              // reuse connection
+  maxConnections: 1,       // free tier friendly
+  maxMessages: 10,
+  connectionTimeout: 60_000, // 60 sec
+  greetingTimeout: 30_000,
+  socketTimeout: 60_000
 });
+
 
 const path = require('path');
 app.set('view engine', 'ejs');
