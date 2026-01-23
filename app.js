@@ -44,29 +44,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
-// import nodemailer from "nodemailer";
-
-// const transporter = nodemailer.createTransport({
-//   host: "smtp-relay.brevo.com",
-//   port: 587,
-//   secure: false,
-
-//   auth: {
-//     user: process.env.BREVO_SMTP_LOGIN,
-//     pass: process.env.BREVO_SMTP_KEY
-//   },
-
-//   // 🔥 CRITICAL FOR RENDER
-//   pool: true,              // reuse connection
-//   maxConnections: 1,       // free tier friendly
-//   maxMessages: 10,
-//   connectionTimeout: 60_000, // 60 sec
-//   greetingTimeout: 30_000,
-//   socketTimeout: 60_000
-// });
-
-
 const path = require('path');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -151,9 +128,21 @@ app.post('/contact', async (req, res) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    // await transporter.sendMail(mailOptions);
 
-    console.log("Email sent successfully");
+
+await new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      } else {
+        resolve(info);
+      }
+    });
+  });
+
+
 
     // Success Flash
     req.flash(
