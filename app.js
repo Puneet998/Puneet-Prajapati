@@ -4,6 +4,7 @@ const app = express();
 const mongoose=require("mongoose");
 const bodyParser = require('body-parser');
 const nodemailer = require("nodemailer");
+const axios = require('axios');
 require('dotenv').config(); // Load environment variables from .env file
 
 const validateMessage=require("./schema");
@@ -25,24 +26,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: process.env.EMAIL,
-//     pass: process.env.PASSWORD
-//   }
-// });
-
-
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_SMTP_LOGIN,
-    pass: process.env.BREVO_SMTP_KEY
-  }
-});
 
 const path = require('path');
 app.set('view engine', 'ejs');
@@ -75,24 +58,13 @@ app.use((req,res,next)=>{
 })
 
 app.get('/', (req, res) => {
-  // if(req.headers['sec-ch-ua-platform']=='"Android"'){
-  //   res.send('you need a laptop and computer');
-  //   return;
-  // }
-  // else if(req.headers['sec-ch-ua-platform']=='"Windows"'){
-  // res.render('index.ejs');
-  //   return;
-  // } 
   res.render('index.ejs');
 });
 
 //from ejs
-
 app.post('/contact', async (req, res) => {
   const { name, email, message } = req.body;
-
   console.log("req.body:", req.body);
-
   // Joi Validation
   const { error } = validateMessage({ name, email, message });
   if (error) {
@@ -100,7 +72,6 @@ app.post('/contact', async (req, res) => {
     console.error("Validation Error:", error.details[0].message);
     return res.redirect("/");
   }
-
   try {
     // Save to Database
     const newMessage = new Message({
@@ -109,40 +80,34 @@ app.post('/contact', async (req, res) => {
       msg: message,
       from:"message from ejs making portfolio website"
     });
-
     await newMessage.save();
     console.log("Message saved to DB");
 
     // Send Email
     const capName = name.toUpperCase();
 
-    const mailOptions = {
-      from:process.env.BREVO_SENDER_EMAIL,
-      to: process.env.BREVO_SENDER_EMAIL,
-      subject: `New Message from ${capName} - Portfolio Website`,
-      html: `
-        <p><strong>Sender:</strong> ${capName}</p>
+      await axios.post(
+      process.env.AXIOS_API,
+      {
+        sender: {
+          name: name,
+          email: process.env.SENDER_EMAIL
+        },
+        to: [{ email: process.env.SENDER_EMAIL }],
+        subject: `New Message from ${name} - Portfolio Website`,
+        htmlContent: `
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
-      `,
-    };
-
-    // await transporter.sendMail(mailOptions);
-
-
-await new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.error(err);
-        reject(err);
-      } else {
-        resolve(info);
+        `
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json"
+        }
       }
-    });
-  });
-
-
+    );
 
     // Success Flash
     req.flash(
@@ -157,9 +122,6 @@ await new Promise((resolve, reject) => {
     res.redirect("/");
   }
 });
-
-
-
 
 
 
@@ -193,21 +155,28 @@ app.post("/sendMail", async (req, res) => {
     // ------------------ SEND EMAIL ------------------
     const formattedName = name.toUpperCase();
 
-    const mailOptions = {
-      from:process.env.BREVO_SENDER_EMAIL,
-      to: process.env.BREVO_SENDER_EMAIL,
-      subject: `New Message from ${formattedName} - Portfolio`,
-      html: `
-        <h3>New Contact Submission</h3>
-        <p><strong>Name:</strong> ${formattedName}</p>
+      await axios.post(
+      process.env.AXIOS_API,
+      {
+        sender: {
+          name: name,
+          email: process.env.SENDER_EMAIL
+        },
+        to: [{ email: process.env.SENDER_EMAIL }],
+        subject: `New Message from ${name} - Portfolio Website`,
+        htmlContent: `
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully");
+        `
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
 
     // ------------------ RESPONSE ------------------
     return res.status(200).json({
@@ -234,144 +203,3 @@ app.listen(4000, () => {
   console.log('Server running at http://localhost:4000');
 })
 
-
-// const express = require("express");
-// const cors = require("cors");
-// const mongoose = require("mongoose");
-// const session = require("express-session");
-// const flash = require("connect-flash");
-// const path = require("path");
-// require("dotenv").config();
-
-// const validateMessage = require("./schema");
-// const Message = require("./models/message");
-// const transporter = require("./mailer");
-
-// const app = express();
-
-// // -------------------- DATABASE --------------------
-// mongoose.connect(process.env.MONGO_DB_URL)
-//   .then(() => console.log("MongoDB connected"))
-//   .catch(err => console.error(err));
-
-// // -------------------- MIDDLEWARE --------------------
-// app.use(cors());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-// app.use(express.static(path.join(__dirname, "public")));
-
-// app.set("view engine", "ejs");
-// app.set("views", path.join(__dirname, "views"));
-
-// app.use(session({
-//   secret: "mysupersecretcode",
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
-// }));
-
-// app.use(flash());
-
-// app.use((req, res, next) => {
-//   res.locals.success = req.flash("success");
-//   res.locals.error = req.flash("error");
-//   next();
-// });
-
-// // -------------------- ROUTES --------------------
-
-// app.get("/", (req, res) => {
-//   res.render("index.ejs");
-// });
-
-// // -------------------- CONTACT (EJS) --------------------
-// app.post("/contact", async (req, res) => {
-//   const { name, email, message } = req.body;
-
-//   const { error } = validateMessage({ name, email, message });
-//   if (error) {
-//     req.flash("error", "Invalid input");
-//     return res.redirect("/");
-//   }
-
-//   try {
-//     // ✅ SAVE TO DB (FIRST)
-//     await Message.create({
-//       name,
-//       email,
-//       msg: message,
-//       from: "EJS Portfolio"
-//     });
-
-//     // ✅ SEND EMAIL (ASYNC – NON BLOCKING)
-//     transporter.sendMail({
-//       from: `"Puneet Portfolio" <${process.env.BREVO_SENDER_EMAIL}>`,
-//       to: process.env.BREVO_SENDER_EMAIL,
-//       subject: `New Message from ${name.toUpperCase()}`,
-//       html: `
-//         <p><b>Name:</b> ${name}</p>
-//         <p><b>Email:</b> ${email}</p>
-//         <p>${message}</p>
-//       `
-//     }).catch(err => {
-//       console.error("Email failed:", err.message);
-//     });
-
-//     req.flash("success", `Thanks ${name}, I will reply soon.`);
-//     res.redirect("/");
-
-//   } catch (err) {
-//     console.error(err);
-//     req.flash("error", "Something went wrong");
-//     res.redirect("/");
-//   }
-// });
-
-// // -------------------- CONTACT (REACT / API) --------------------
-// app.post("/sendMail", async (req, res) => {
-//   const { name, email, message } = req.body;
-
-//   const { error } = validateMessage({ name, email, message });
-//   if (error) {
-//     return res.status(400).json({ success: false, message: error.details[0].message });
-//   }
-
-//   try {
-//     await Message.create({
-//       name,
-//       email,
-//       msg: message,
-//       from: "React Portfolio"
-//     });
-
-//     transporter.sendMail({
-//       from: `"Puneet Portfolio" <${process.env.BREVO_SENDER_EMAIL}>`,
-//       to: process.env.BREVO_SENDER_EMAIL,
-//       subject: `New Message from ${name.toUpperCase()}`,
-//       html: `
-//         <h3>New Contact</h3>
-//         <p>Name: ${name}</p>
-//         <p>Email: ${email}</p>
-//         <p>${message}</p>
-//       `
-//     }).catch(err => {
-//       console.error("Email failed:", err.message);
-//     });
-
-//     res.json({ success: true, message: "Message saved successfully" });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: "Server error" });
-//   }
-// });
-
-// // -------------------- FALLBACK --------------------
-// app.all("*", (req, res) => {
-//   res.redirect("/");
-// });
-
-// // -------------------- SERVER --------------------
-// app.listen(4000, () => {
-//   console.log("Server running on port 4000");
-// });
